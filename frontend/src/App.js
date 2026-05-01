@@ -41,6 +41,13 @@ function App() {
 
     const data = res.data?.form_data || {};
 
+    if (res.data.action === "reset") {
+  setForm(emptyForm);
+  setMessage("");
+  setAiSuggestions([]);
+  return;
+}
+
     // ✅ AI Suggestions (ADD HERE)
 if (message.toLowerCase().includes("suggest")) {
   const suggestions = res.data.response

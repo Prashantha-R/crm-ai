@@ -222,7 +222,7 @@ def edit_node(state):
     return {"form_data": data, "response": "Updated successfully"}
 
 def reset_node(state):
-    return {"form_data": reset_tool.invoke({}), "response": "Form cleared"}
+    return {"action":"reset","form_data": reset_tool.invoke({}), "response": "Form cleared"}
 
 def suggest_node(state):
     return {
