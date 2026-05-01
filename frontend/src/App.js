@@ -32,7 +32,7 @@ function App() {
 
   try {
     const res = await axios.post(
-      "http://127.0.0.1:8000/chat",
+      "https://crm-ai-lwnk.onrender.com/chat",
       { message },
       { headers: { "Content-Type": "application/json" } }
     );
