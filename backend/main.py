@@ -222,7 +222,7 @@ def edit_node(state):
     return {"form_data": data, "response": "Updated successfully"}
 
 def reset_node(state):
-    return {"action":"reset","form_data": reset_tool.invoke({}), "response": "Form cleared"}
+    return {"action": "reset","form_data": reset_tool.invoke({}), "response": "Form cleared"}
 
 def suggest_node(state):
     return {
@@ -274,7 +274,10 @@ def chat(req: ChatRequest):
 
     result = app_graph.invoke(state)
 
-    if result["form_data"]:
+    #
+    if result.get("action") == "reset":
+        memory = {}
+    else:
         memory = result["form_data"]
 
     return result

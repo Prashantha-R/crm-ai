@@ -42,14 +42,21 @@ function App() {
     const data = res.data?.form_data || {};
 
     if (res.data.action === "reset") {
-  setForm(emptyForm);
+  setForm({ ...emptyForm });   // 🔥 force new object
   setMessage("");
   setAiSuggestions([]);
+
+  setChatHistory((prev) => [
+    ...prev,
+    { type: "user", text: message },
+    { type: "ai", text: "Form cleared successfully ✅" }
+  ]);
+
   return;
 }
 
     // ✅ AI Suggestions (ADD HERE)
-if (message.toLowerCase().includes("suggest")) {
+if (res.data.response && message.toLowerCase().includes("suggest")) {
   const suggestions = res.data.response
     .split("\n")
     .map(s => s.replace(/^\d+\.\s*/, ""))
@@ -59,7 +66,7 @@ if (message.toLowerCase().includes("suggest")) {
 }
 
     // DATE FIX
-    let fixedDate = form.date;
+    let fixedDate = "";
     if (data.date) {
       let d = data.date.toLowerCase().trim();
       const today = new Date();
@@ -77,7 +84,7 @@ if (message.toLowerCase().includes("suggest")) {
     }
 
     // TIME FIX
-    let fixedTime = form.time;
+    let fixedTime = "";
     if (data.time) {
       let t = data.time.toLowerCase().trim().replace(/\s/g, "");
 
@@ -103,8 +110,8 @@ if (message.toLowerCase().includes("suggest")) {
     setForm((prev) => ({
       ...prev,
       hcp_name: data.hcp_name ?? prev.hcp_name,
-      date: fixedDate || prev.date,
-      time: fixedTime || prev.time,
+      date: data.date !== undefined ? fixedDate : prev.date,
+      time: data.time !== undefined ? fixedTime : prev.time,
       sentiment: data.sentiment ?? prev.sentiment,
       materials: data.materials ?? prev.materials,
       topics: data.topics ?? prev.topics,
