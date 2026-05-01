@@ -241,6 +241,8 @@ It improves:
 * User experience
 
 ---
+Frontend: https://crm-kcys76vd0-prashantha-rs-projects.vercel.app  
+Backend: https://crm-ai-lwnk.onrender.com
 
 ## 👤 Author
 
