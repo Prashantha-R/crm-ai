@@ -1,109 +1,152 @@
 # 🤖 AI-First CRM HCP Interaction System
 
+---
+
 ## 📌 Overview
 
-This project is an **AI-powered Customer Relationship Management (CRM) system** designed for logging interactions with **Healthcare Professionals (HCPs)**.
+This project is an **AI-first Customer Relationship Management (CRM)** system designed for logging interactions with **Healthcare Professionals (HCPs)** such as doctors.
 
-Instead of manually filling forms, users interact with an **AI assistant**, which automatically extracts information from natural language and populates the form.
+Instead of manually filling forms, users interact with an **AI Assistant**, which converts **unstructured natural language input into structured CRM data automatically**.
 
 ---
 
 ## 🎯 Objective
 
-To build an **AI-first interaction logging system** where:
+To build an intelligent interaction logging system where:
 
 * Users describe interactions in natural language
-* AI extracts structured data
+* AI extracts structured information
 * Form is auto-filled without manual input
+
+👉 This system transforms **unstructured text → structured CRM data in real time**
 
 ---
 
 ## 🧠 Key Concepts
 
-* **CRM (Customer Relationship Management)** → System to manage customer interactions
-* **HCP (Healthcare Professional)** → Doctors, medical professionals
-* **LLM (Large Language Model)** → AI model for understanding language
-* **LangGraph** → AI agent framework for tool orchestration
+* **CRM (Customer Relationship Management)** → System to manage interactions with customers
+* **HCP (Healthcare Professional)** → Doctors, medical practitioners
+* **LLM (Large Language Model)** → AI model used for understanding and generating text
+* **LangGraph** → Framework to build AI agents with tool-based workflows
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### 🔹 Frontend
 
 * React (UI development)
 * Redux (State management)
-* Axios (API calls)
+* Axios (API communication)
 
-### Backend
+### 🔹 Backend
 
-* FastAPI (Python API framework)
+* FastAPI (Python backend framework)
 * LangGraph (AI agent orchestration)
-* Groq LLM (Language model)
+* Groq LLM (Language processing)
 
 ---
 
-## ⚙️ Features
+## ⚙️ Core Features
 
 ### ✅ AI-Controlled Form
 
-* Users do NOT manually fill the form
-* AI extracts and fills all fields automatically
-
-### ✅ 5 LangGraph Tools
-
-1. **Log Interaction Tool**
-
-   * Extracts HCP name, date, time, sentiment, topics, materials
-
-2. **Edit Interaction Tool**
-
-   * Updates specific fields only
-   * Example: “Change sentiment to negative”
-
-3. **Reset Tool**
-
-   * Clears all form data
-
-4. **Suggest Tool**
-
-   * Generates AI-based follow-up actions
-
-5. **Summarize Tool**
-
-   * Creates summary of interaction
+* No manual data entry
+* AI fills form fields automatically
 
 ---
 
-## 🔄 System Flow
+### ✅ Unstructured → Structured Conversion
+
+Example input:
+
+Met Dr Ramesh yesterday evening and shared brochure
+
+Converted into:
+
+* HCP Name → Dr Ramesh
+* Date → 2026-04-29
+* Time → 18:00
+* Materials → brochure
+
+---
+
+### ✅ 5 LangGraph Tools
+
+#### 1. Log Interaction Tool
+
+* Extracts structured data from natural language
+
+#### 2. Edit Interaction Tool
+
+* Updates specific fields only
+* Example: Change sentiment to negative
+
+#### 3. Reset Tool
+
+* Clears all form data
+
+#### 4. Suggest Tool
+
+* Uses LLM to generate follow-up actions
+
+#### 5. Summarize Tool
+
+* Converts form data into summary text
+
+---
+
+### ⭐ AI Suggested Follow-ups (New Feature)
+
+* Automatically generates actionable next steps
+* Displayed as bullet list in UI
+
+Example:
+
+* Schedule follow-up meeting
+* Share additional materials
+* Confirm next visit
+
+---
+
+## 🔄 System Architecture
+
+### Flow:
 
 1. User enters message in chat
 2. Frontend sends request to backend (`/chat`)
-3. LangGraph agent selects appropriate tool
-4. Tool processes input using rules + LLM
-5. Backend returns structured response
-6. Frontend updates form automatically
+3. LangGraph agent acts as decision engine
+4. Router selects appropriate tool
+5. Tool processes input (rules + LLM)
+6. Structured response returned
+7. Frontend updates form
+
+👉 AI fully controls the system — user does not manually edit the form
 
 ---
 
 ## 🖥️ UI Layout
 
 * **Left Panel** → Interaction Form
-* **Right Panel** → AI Chat Assistant
+* **Right Panel** → AI Assistant Chat
+
+Includes:
+
+* Chat bubbles
+* Sentiment emojis 😊 😐 😠
+* AI Suggested Follow-ups
 
 ---
 
-## 🧪 Test Cases
+## 🧪 Test Inputs
 
-Try these inputs:
+Try these:
 
-```
-Met Dr. Smith today at 5pm, discussion went well
+Met Dr Smith today at 5pm, discussion went well
 Change sentiment to negative
-Clear the form
 Suggest next steps
 Summarize interaction
-```
+Clear the form
 
 ---
 
@@ -111,66 +154,56 @@ Summarize interaction
 
 ### 🔹 Clone Repository
 
-```
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-```
+git clone https://github.com/Prashantha-R/crm-ai.git
+cd crm-ai
 
 ---
 
 ### 🔹 Frontend Setup
 
-```
 cd frontend
 npm install
 npm start
-```
 
-Runs on: `http://localhost:3000`
+Runs on: http://localhost:3000
 
 ---
 
 ### 🔹 Backend Setup
 
-```
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
-```
 
-Runs on: `http://127.0.0.1:8000`
+Runs on: http://127.0.0.1:8000
 
 ---
 
-## 🔐 Environment Setup
+## 🔐 Environment Variables (IMPORTANT)
 
-Replace your Groq API key in backend:
+Create a `.env` file inside `backend/`:
 
-```python
-llm = ChatGroq(
-    model="llama-3.1-8b-instant",
-    api_key="YOUR_API_KEY"
-)
-```
+GROQ_API_KEY=your_api_key_here
+
+⚠️ Do NOT upload `.env` to GitHub
 
 ---
 
 ## 📁 Project Structure
 
-```
-project-root/
- ├── frontend/
- │    ├── src/
- │    ├── public/
- │    ├── package.json
- │
- ├── backend/
- │    ├── main.py
- │    ├── requirements.txt
- │
- ├── README.md
- └── .gitignore
-```
+crm-ai/
+├── frontend/
+│    ├── src/
+│    ├── public/
+│    ├── package.json
+│
+├── backend/
+│    ├── main.py
+│    ├── requirements.txt
+│    ├── .env
+│
+├── README.md
+└── .gitignore
 
 ---
 
@@ -179,29 +212,36 @@ project-root/
 The video includes:
 
 * Frontend walkthrough
-* All 5 tools demonstration
-* Code explanation
-* System architecture
+* Demonstration of all 5 tools
+* AI Suggested Follow-ups
+* Code explanation (frontend + backend)
+* LangGraph architecture
+* Final understanding
 
 ---
 
 ## 🚀 Key Highlights
 
-* AI replaces manual form filling
-* Real-time structured data extraction
-* Modular tool-based architecture
-* Scalable using LangGraph
+* Converts natural language into structured CRM data
+* Reduces manual data entry
+* Uses AI + rule-based hybrid approach
+* Modular architecture using LangGraph
+* Scalable and extendable
 
 ---
 
 ## 📌 Conclusion
 
-This project demonstrates how **AI can transform traditional CRM systems** into intelligent, conversational platforms, improving efficiency and user experience.
+This project demonstrates how **AI can replace traditional form-based CRM systems** with conversational interfaces.
+
+It improves:
+
+* Efficiency
+* Accuracy
+* User experience
 
 ---
 
 ## 👤 Author
 
 **Prashantha R**
-
----

@@ -4,6 +4,7 @@ import axios from "axios";
 function App() {
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
 
   const emptyForm = {
     hcp_name: "",
@@ -23,85 +24,88 @@ function App() {
   const resetForm = () => {
     setForm(emptyForm);
     setMessage("");
+    setAiSuggestions([]);
   };
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
+  if (!message.trim()) return;
 
-    try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/chat",
-        { message },
-        { headers: { "Content-Type": "application/json" } }
-      );
+  try {
+    const res = await axios.post(
+      "http://127.0.0.1:8000/chat",
+      { message },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-      let data = res.data.form_data || {};
+    console.log("FULL RESPONSE:", res.data); // ✅ DEBUG
 
-      // DATE FIX
-      let fixedDate = form.date;
-      if (data.date) {
-        let d = data.date.toLowerCase().trim();
-        const today = new Date();
+    const data = res.data?.form_data || {};
 
-        if (d === "today") fixedDate = today.toISOString().split("T")[0];
-        else if (d === "yesterday") {
-          today.setDate(today.getDate() - 1);
-          fixedDate = today.toISOString().split("T")[0];
-        }
-        else if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
-          const [dd, mm, yyyy] = d.split("-");
-          fixedDate = `${yyyy}-${mm}-${dd}`;
-        }
-        else if (/^\d{4}-\d{2}-\d{2}$/.test(d)) fixedDate = d;
+    // ✅ AI Suggestions (ADD HERE)
+if (message.toLowerCase().includes("suggest")) {
+  const suggestions = res.data.response
+    .split("\n")
+    .map(s => s.replace(/^\d+\.\s*/, ""))
+    .filter(s => s.trim() !== "");
+
+  setAiSuggestions(suggestions);
+}
+
+    // DATE FIX
+    let fixedDate = form.date;
+    if (data.date) {
+      let d = data.date.toLowerCase().trim();
+      const today = new Date();
+
+      if (d === "today") fixedDate = today.toISOString().split("T")[0];
+      else if (d === "yesterday") {
+        today.setDate(today.getDate() - 1);
+        fixedDate = today.toISOString().split("T")[0];
       }
-
-      // TIME FIX
-      let fixedTime = form.time;
-      if (data.time) {
-        let t = data.time.toLowerCase().trim().replace(/\s/g, "");
-
-        if (t === "morning") fixedTime = "09:00";
-        else if (t === "afternoon") fixedTime = "15:00";
-        else if (t === "evening") fixedTime = "18:00";
-        else if (t.includes("am") || t.includes("pm")) {
-          let meridian = t.includes("pm") ? "pm" : "am";
-          let [h, m] = t.replace(/am|pm/g, "").split(":");
-
-          h = parseInt(h);
-          m = m || "00";
-
-          if (meridian === "pm" && h !== 12) h += 12;
-          if (meridian === "am" && h === 12) h = 0;
-
-          fixedTime = `${h.toString().padStart(2, "0")}:${m}`;
-        }
-        else if (/^\d{2}:\d{2}$/.test(t)) fixedTime = t;
+      else if (/^\d{2}-\d{2}-\d{4}$/.test(d)) {
+        const [dd, mm, yyyy] = d.split("-");
+        fixedDate = `${yyyy}-${mm}-${dd}`;
       }
+      else if (/^\d{4}-\d{2}-\d{2}$/.test(d)) fixedDate = d;
+    }
 
-      // RESET
-      const isReset =
-        data.hcp_name === "" &&
-        data.date === "" &&
-        data.time === "" &&
-        data.sentiment === "" &&
-        data.materials === "" &&
-        data.topics === "";
+    // TIME FIX
+    let fixedTime = form.time;
+    if (data.time) {
+      let t = data.time.toLowerCase().trim().replace(/\s/g, "");
 
-      if (isReset) {
-        setForm(emptyForm);
-      } else {
-        setForm((prev) => ({
-          ...prev,
-          hcp_name: data.hcp_name ?? prev.hcp_name,
-          date: fixedDate || prev.date,
-          time: fixedTime || prev.time,
-          sentiment: data.sentiment ?? prev.sentiment,
-          materials: data.materials ?? prev.materials,
-          topics: data.topics ?? prev.topics
-        }));
+      if (t === "morning") fixedTime = "09:00";
+      else if (t === "afternoon") fixedTime = "15:00";
+      else if (t === "evening") fixedTime = "18:00";
+      else if (t.includes("am") || t.includes("pm")) {
+        let meridian = t.includes("pm") ? "pm" : "am";
+        let [h, m] = t.replace(/am|pm/g, "").split(":");
+
+        h = parseInt(h);
+        m = m || "00";
+
+        if (meridian === "pm" && h !== 12) h += 12;
+        if (meridian === "am" && h === 12) h = 0;
+
+        fixedTime = `${h.toString().padStart(2, "0")}:${m}`;
       }
+      else if (/^\d{2}:\d{2}$/.test(t)) fixedTime = t;
+    }
 
-      const aiText = `${res.data.response || "Done"}
+    // UPDATE FORM SAFELY
+    setForm((prev) => ({
+      ...prev,
+      hcp_name: data.hcp_name ?? prev.hcp_name,
+      date: fixedDate || prev.date,
+      time: fixedTime || prev.time,
+      sentiment: data.sentiment ?? prev.sentiment,
+      materials: data.materials ?? prev.materials,
+      topics: data.topics ?? prev.topics,
+      outcomes: data.outcomes ?? prev.outcomes,
+      followup: data.followup ?? prev.followup
+    }));
+
+    const aiText = `${res.data?.response || "Done"}
 
 👨‍⚕️ HCP: ${data.hcp_name || "N/A"}
 📅 Date: ${fixedDate || "N/A"}
@@ -110,19 +114,19 @@ function App() {
 📦 Materials: ${data.materials || "None"}
 📌 Topics: ${data.topics || "N/A"}`;
 
-      setChatHistory((prev) => [
-        ...prev,
-        { type: "user", text: message },
-        { type: "ai", text: aiText }
-      ]);
+    setChatHistory((prev) => [
+      ...prev,
+      { type: "user", text: message },
+      { type: "ai", text: aiText }
+    ]);
 
-      setMessage("");
+    setMessage("");
 
-    } catch (err) {
-      console.error(err);
-      alert("Backend error");
-    }
-  };
+  } catch (err) {
+    console.error("ERROR DETAILS:", err?.response?.data || err.message); // ✅ better debug
+    alert("Backend error");
+  }
+};
 
   const inputStyle = {
     width: "100%",
@@ -225,11 +229,13 @@ function App() {
             color: "#2563eb"
           }}>
             <b>AI Suggested Follow-ups:</b>
-            <ul>
-              <li>Schedule follow-up meeting in 2 weeks</li>
-              <li>Send product brochure</li>
-              <li>Add doctor to engagement list</li>
-            </ul>
+          <ul>
+            {aiSuggestions.length > 0 ? (
+              aiSuggestions.map((item, i) => <li key={i}>{item}</li>)
+            ) : (
+              <li>No suggestions yet</li>
+            )}
+          </ul>
           </div>
         </div>
 
